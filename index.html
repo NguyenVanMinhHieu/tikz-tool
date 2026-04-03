@@ -4,11 +4,11 @@
     <meta charset="UTF-8">
     <title>TikZ-Tool - Nguyễn Hiếu</title>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; max-width: 800px; margin: 20px auto; padding: 20px; line-height: 1.6; }
-        textarea { width: 100%; height: 150px; margin-bottom: 10px; padding: 10px; box-sizing: border-box; }
-        input { width: 100%; padding: 10px; margin-bottom: 10px; box-sizing: border-box; }
-        button { padding: 10px 20px; background: #007bff; color: white; border: none; cursor: pointer; border-radius: 4px; }
-        #result { background: #f4f4f4; padding: 15px; white-space: pre-wrap; border: 1px solid #ccc; margin-top: 20px; border-radius: 4px; font-family: monospace; }
+        body { font-family: sans-serif; max-width: 800px; margin: 20px auto; padding: 20px; }
+        textarea { width: 100%; height: 150px; margin-bottom: 10px; }
+        input { width: 100%; padding: 10px; margin-bottom: 10px; }
+        button { padding: 10px 20px; background: #007bff; color: white; border: none; cursor: pointer; }
+        #result { background: #f4f4f4; padding: 15px; white-space: pre-wrap; border: 1px solid #ccc; margin-top: 20px; }
     </style>
 </head>
 <body>
@@ -16,7 +16,6 @@
     <input type="password" id="apiKey" placeholder="Nhập API Key">
     <textarea id="prompt" placeholder="Mô tả hình vẽ..."></textarea>
     <button onclick="generateTikz()">Tạo Code TiKz</button>
-    <button onclick="copyCode()" style="background: #28a745;">Copy Code</button>
     <div id="result">Kết quả sẽ hiển thị ở đây...</div>
 
     <script>
@@ -29,8 +28,8 @@
             resultDiv.innerText = "Đang tạo...";
 
             try {
-                // Sử dụng model gemini-1.5-flash và đường dẫn v1beta
-                const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+                // Sử dụng đường dẫn v1 cho model 2.0
+                const url = `https://generativelanguage.googleapis.com/v1/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
                 
                 const response = await fetch(url, {
                     method: 'POST',
@@ -49,10 +48,6 @@
             } catch (error) {
                 resultDiv.innerText = "Lỗi kết nối: " + error.message;
             }
-        }
-
-        function copyCode() {
-            navigator.clipboard.writeText(document.getElementById('result').innerText).then(() => alert("Đã copy!"));
         }
     </script>
 </body>
