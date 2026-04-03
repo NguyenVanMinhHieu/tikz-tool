@@ -1,38 +1,49 @@
-<!DOCTYPE html>
-<html lang="vi">
-<head>
-    <meta charset="UTF-8">
-    <title>TikZ-Tool - Nguyễn Hiếu</title>
-    <script type="module">
-        import { GoogleGenerativeAI } from "https://esm.run/@google/generative-ai";
+// To run this code you need to install the following dependencies:
+// dotnet add package Google.GenAI
 
-        // --- DÁN KEY CỦA BẠN VÀO ĐÂY ---
-        const API_KEY = "AIzaSy..."; // Thay bằng Key thật của bạn
-        // -------------------------------
+using System;
+using System.Threading.Tasks;
+using System.Collections.Generic;
+using Google.GenAI;
+using Google.GenAI.Types;
 
-        window.generateTikz = async () => {
-            const prompt = document.getElementById('prompt').value;
-            const resultDiv = document.getElementById('result');
+public class 
+{
+    public static async Task Main(string[] args)
+    {
+        var client = new Client(
+            apiKey: Environment.GetEnvironmentVariable("GEMINI_API_KEY")
+        );
 
-            if (!prompt) { alert("Vui lòng nhập mô tả!"); return; }
-            resultDiv.innerText = "Đang tạo code...";
-
-            try {
-                const genAI = new GoogleGenerativeAI(API_KEY);
-                const model = genAI.getGenerativeModel({ model: "gemini-pro-latest" });
-
-                const result = await model.generateContent("Bạn là chuyên gia TiKz. Hãy tạo code LaTeX sử dụng gói tkz-euclide cho yêu cầu: " + prompt);
-                resultDiv.innerText = result.response.text();
-            } catch (error) {
-                resultDiv.innerText = "Lỗi: " + error.message;
-            }
+        var model = "gemini-pro-latest";
+        var contents = new List<Content>
+        {
+            new Content
+            {
+                Role = "user",
+                Parts = new List<Part>
+                {
+                    new Part { Text = "INSERT_INPUT_HERE" },
+                }
+            },
         };
-    </script>
-</head>
-<body>
-    <h1>TikZ-Tool - Nguyễn Hiếu</h1>
-    <textarea id="prompt" style="width:100%; height:150px;" placeholder="Mô tả hình vẽ..."></textarea>
-    <button onclick="generateTikz()">Tạo Code TiKz</button>
-    <div id="result" style="background:#f4f4f4; padding:15px; margin-top:20px;">Kết quả sẽ hiển thị ở đây...</div>
-</body>
-</html>
+
+
+
+        var config = new GenerateContentConfig
+        {
+            ThinkingConfig = new ThinkingConfig
+            {
+                ThinkingLevel = "HIGH"
+            },
+        };
+
+        await foreach (var chunk in client.Models.GenerateContentStreamAsync(model, contents, config))
+        {
+            Console.Write(chunk);
+        }
+    }
+
+}
+
+
