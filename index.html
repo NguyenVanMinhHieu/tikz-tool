@@ -3,45 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <title>TikZ-Tool - Nguyễn Hiếu</title>
-    <!-- Nhúng SDK chính thức của Google -->
-    <script type="importmap">
-      {
-        "imports": {
-          "@google/aistudio-google": "https://aistudio.google.com/prompts/1Pir_uAQ5MciSSXsp2W48HI9R-O14XHaX"
-        }
-      }
-    </script>
-    <style>
-        body { font-family: sans-serif; max-width: 800px; margin: 20px auto; padding: 20px; }
-        textarea { width: 100%; height: 150px; margin-bottom: 10px; }
-        input { width: 100%; padding: 10px; margin-bottom: 10px; }
-        button { padding: 10px 20px; background: #007bff; color: white; border: none; cursor: pointer; }
-        #result { background: #f4f4f4; padding: 15px; white-space: pre-wrap; border: 1px solid #ccc; margin-top: 20px; }
-    </style>
-</head>
-<body>
-    <h1>TikZ-Tool - Nguyễn Hiếu</h1>
-    <textarea id="prompt" placeholder="Mô tả hình vẽ..."></textarea>
-    <button id="btn">Tạo Code TiKz</button>
-    <div id="result">Kết quả sẽ hiển thị ở đây...</div>
-
     <script type="module">
-        import { GoogleAIStudio } from "@https://aistudio.google.com/prompts/1Pir_uAQ5MciSSXsp2W48HI9R-O14XHaX";
+        import { GoogleGenerativeAI } from "https://esm.run/@google/generative-ai";
 
-        document.getElementById('btn').addEventListener('click', async () => {
+        // --- DÁN KEY CỦA BẠN VÀO ĐÂY ---
+        const API_KEY = "AIzaSy..."; // Thay bằng Key thật của bạn
+        // -------------------------------
+
+        window.generateTikz = async () => {
             const prompt = document.getElementById('prompt').value;
             const resultDiv = document.getElementById('result');
 
+            if (!prompt) { alert("Vui lòng nhập mô tả!"); return; }
+            resultDiv.innerText = "Đang tạo code...";
+
             try {
-                // Sử dụng model gemini-1.5-flash (Model ổn định nhất cho SDK)
-                const model = genAI.getGenerativeModel({ model: "https://aistudio.google.com/prompts/1Pir_uAQ5MciSSXsp2W48HI9R-O14XHaX" });
+                const genAI = new GoogleGenerativeAI(API_KEY);
+                const model = genAI.getGenerativeModel({ model: "gemini-pro-latest" });
 
                 const result = await model.generateContent("Bạn là chuyên gia TiKz. Hãy tạo code LaTeX sử dụng gói tkz-euclide cho yêu cầu: " + prompt);
                 resultDiv.innerText = result.response.text();
             } catch (error) {
-                resultDiv.innerText = "Lỗi SDK: " + error.message;
+                resultDiv.innerText = "Lỗi: " + error.message;
             }
-        });
+        };
     </script>
+</head>
+<body>
+    <h1>TikZ-Tool - Nguyễn Hiếu</h1>
+    <textarea id="prompt" style="width:100%; height:150px;" placeholder="Mô tả hình vẽ..."></textarea>
+    <button onclick="generateTikz()">Tạo Code TiKz</button>
+    <div id="result" style="background:#f4f4f4; padding:15px; margin-top:20px;">Kết quả sẽ hiển thị ở đây...</div>
 </body>
 </html>
