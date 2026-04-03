@@ -2,23 +2,31 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <title>TiKz-Tool- Nguyễn Hiếu</title>
+    <title>TikZ-Tool - Nguyễn Hiếu</title>
     <style>
-        body { font-family: sans-serif; max-width: 800px; margin: 20px auto; padding: 20px; }
-        textarea { width: 100%; height: 150px; margin-bottom: 10px; }
-        button { padding: 10px 20px; background: #007bff; color: white; border: none; cursor: pointer; }
-        #result { background: #f4f4f4; padding: 15px; white-space: pre-wrap; border: 1px solid #ccc; margin-top: 20px; }
+        body { font-family: 'Segoe UI', sans-serif; max-width: 800px; margin: 20px auto; padding: 20px; line-height: 1.6; }
+        textarea { width: 100%; height: 150px; margin-bottom: 10px; padding: 10px; box-sizing: border-box; }
+        input { width: 100%; padding: 10px; margin-bottom: 10px; box-sizing: border-box; }
+        button { padding: 10px 20px; background: #007bff; color: white; border: none; cursor: pointer; border-radius: 4px; }
+        button:hover { background: #0056b3; }
+        #result { background: #f4f4f4; padding: 15px; white-space: pre-wrap; border: 1px solid #ccc; margin-top: 20px; border-radius: 4px; font-family: monospace; }
+        footer { margin-top: 30px; font-size: 0.9em; color: #666; border-top: 1px solid #eee; padding-top: 10px; }
     </style>
 </head>
 <body>
-    <h1>Công cụ tạo Code TiKz</h1>
-    <p>Vui lòng nhập API Key của bạn để sử dụng (Lấy tại <a href="https://aistudio.google.com/app/apikey" target="_blank">Google AI Studio</a>):</p>
-    <input type="password" id="apiKey" placeholder="Nhập API Key của bạn tại đây" style="width: 100%; margin-bottom: 10px; padding: 8px;">
+    <h1>TikZ-Tool - Nguyễn Hiếu</h1>
+    <p>Nhập API Key (Lấy tại <a href="https://aistudio.google.com/app/apikey" target="_blank">Google AI Studio</a>):</p>
+    <input type="password" id="apiKey" placeholder="Nhập API Key của bạn tại đây">
     
-    <textarea id="prompt" placeholder="Mô tả hình vẽ bạn muốn tạo..."></textarea>
+    <textarea id="prompt" placeholder="Mô tả chi tiết hình vẽ bạn muốn tạo..."></textarea>
     <button onclick="generateTikz()">Tạo Code TiKz</button>
+    <button onclick="copyCode()" style="background: #28a745;">Copy Code</button>
     
     <div id="result">Kết quả sẽ hiển thị ở đây...</div>
+
+    <footer>
+        Thiết kế bởi Nguyễn Hiếu. Nếu gặp khó khăn, hãy liên hệ: 0398514851
+    </footer>
 
     <script>
         async function generateTikz() {
@@ -27,7 +35,6 @@
             const resultDiv = document.getElementById('result');
 
             if (!apiKey) { alert("Vui lòng nhập API Key!"); return; }
-
             resultDiv.innerText = "Đang tạo code, vui lòng chờ...";
 
             try {
@@ -35,7 +42,10 @@
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        contents: [{ parts: [{ text: "Bạn là chuyên gia TiKz. Hãy tạo code LaTeX cho yêu cầu sau: " + prompt }] }]
+                        system_instruction: {
+                            parts: [{ text: "Bạn là chuyên gia TiKz. Hãy luôn sử dụng gói tkz-euclide cho hình học phẳng. Code phải sạch, có chú thích rõ ràng, sử dụng tọa độ hợp lý, và luôn bao gồm đầy đủ cấu trúc tài liệu LaTeX (documentclass, begin document, end document). Nếu người dùng mô tả hình, hãy tự suy luận tọa độ để hình vẽ cân đối nhất." }]
+                        },
+                        contents: [{ parts: [{ text: prompt }] }]
                     })
                 });
 
@@ -48,6 +58,11 @@
             } catch (error) {
                 resultDiv.innerText = "Có lỗi xảy ra: " + error.message;
             }
+        }
+
+        function copyCode() {
+            const text = document.getElementById('result').innerText;
+            navigator.clipboard.writeText(text).then(() => alert("Đã copy code!"));
         }
     </script>
 </body>
