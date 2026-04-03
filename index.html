@@ -7,7 +7,7 @@
     <script type="importmap">
       {
         "imports": {
-          "@google/generative-ai": "https://esm.run/@google/generative-ai"
+          "@google/aistudio-google": "https://aistudio.google.com/prompts/1Pir_uAQ5MciSSXsp2W48HI9R-O14XHaX"
         }
       }
     </script>
@@ -21,26 +21,20 @@
 </head>
 <body>
     <h1>TikZ-Tool - Nguyễn Hiếu</h1>
-    <input type="password" id="apiKey" placeholder="Nhập API Key">
     <textarea id="prompt" placeholder="Mô tả hình vẽ..."></textarea>
     <button id="btn">Tạo Code TiKz</button>
     <div id="result">Kết quả sẽ hiển thị ở đây...</div>
 
     <script type="module">
-        import { GoogleGenerativeAI } from "@google/generative-ai";
+        import { GoogleAIStudio } from "@https://aistudio.google.com/prompts/1Pir_uAQ5MciSSXsp2W48HI9R-O14XHaX";
 
         document.getElementById('btn').addEventListener('click', async () => {
-            const apiKey = document.getElementById('apiKey').value;
             const prompt = document.getElementById('prompt').value;
             const resultDiv = document.getElementById('result');
 
-            if (!apiKey) { alert("Nhập API Key!"); return; }
-            resultDiv.innerText = "Đang kết nối với Google AI...";
-
             try {
-                const genAI = new GoogleGenerativeAI(apiKey);
                 // Sử dụng model gemini-1.5-flash (Model ổn định nhất cho SDK)
-                const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+                const model = genAI.getGenerativeModel({ model: "https://aistudio.google.com/prompts/1Pir_uAQ5MciSSXsp2W48HI9R-O14XHaX" });
 
                 const result = await model.generateContent("Bạn là chuyên gia TiKz. Hãy tạo code LaTeX sử dụng gói tkz-euclide cho yêu cầu: " + prompt);
                 resultDiv.innerText = result.response.text();
