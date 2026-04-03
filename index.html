@@ -1,15 +1,17 @@
 <!DOCTYPE html>
 <html>
 <body>
-    <input type="password" id="key" placeholder="API Key">
-    <button onclick="check()">Kiểm tra Model khả dụng</button>
+    <input type="password" id="key" placeholder="Nhập API Key">
+    <button onclick="check()">Liệt kê Model khả dụng</button>
     <pre id="result"></pre>
     <script>
         async function check() {
             const key = document.getElementById('key').value;
             const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${key}`);
             const data = await res.json();
-            document.getElementById('result').innerText = JSON.stringify(data, null, 2);
+            // Chỉ lấy tên model để bạn dễ nhìn
+            const modelNames = data.models.map(m => m.name);
+            document.getElementById('result').innerText = modelNames.join('\n');
         }
     </script>
 </body>
