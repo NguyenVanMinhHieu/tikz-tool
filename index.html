@@ -1,51 +1,23 @@
 <!DOCTYPE html>
-<html lang="vi">
-<head>
-    <meta charset="UTF-8">
-    <title>TikZ-Tool - Nguyễn Hiếu</title>
-    <style>
-        body { font-family: sans-serif; max-width: 800px; margin: 20px auto; padding: 20px; }
-        textarea { width: 100%; height: 150px; margin-bottom: 10px; }
-        input { width: 100%; padding: 10px; margin-bottom: 10px; }
-        button { padding: 10px 20px; background: #007bff; color: white; border: none; cursor: pointer; }
-        #result { background: #f4f4f4; padding: 15px; white-space: pre-wrap; border: 1px solid #ccc; margin-top: 20px; }
-    </style>
-</head>
+<html>
 <body>
-    <h1>TikZ-Tool - Nguyễn Hiếu</h1>
-    <input type="password" id="apiKey" placeholder="Nhập API Key">
-    <textarea id="prompt" placeholder="Mô tả hình vẽ..."></textarea>
-    <button onclick="generateTikz()">Tạo Code TiKz</button>
-    <div id="result">Kết quả sẽ hiển thị ở đây...</div>
-
+    <input type="password" id="key" placeholder="API Key">
+    <textarea id="prompt"></textarea>
+    <button onclick="run()">Tạo Code</button>
+    <div id="result"></div>
     <script>
-        async function generateTikz() {
-            const apiKey = document.getElementById('apiKey').value;
-            const userPrompt = document.getElementById('prompt').value;
-            const resultDiv = document.getElementById('result');
-
-            if (!apiKey) { alert("Nhập API Key!"); return; }
-            resultDiv.innerText = "Đang tạo...";
-
-            try {
-                // Sử dụng v1 thay vì v1beta
-                const response = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        contents: [{ parts: [{ text: "Bạn là chuyên gia TiKz. Hãy tạo code LaTeX sử dụng gói tkz-euclide cho yêu cầu: " + userPrompt }] }]
-                    })
-                });
-
-                const data = await response.json();
-                if (data.candidates) {
-                    resultDiv.innerText = data.candidates[0].content.parts[0].text;
-                } else {
-                    resultDiv.innerText = "Lỗi: " + JSON.stringify(data);
-                }
-            } catch (error) {
-                resultDiv.innerText = "Lỗi kết nối: " + error.message;
-            }
+        async function run() {
+            const key = document.getElementById('key').value;
+            const prompt = document.getElementById('prompt').value;
+            // Dùng gemini-pro (model cơ bản nhất, luôn luôn tồn tại)
+            const url = `https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent?key=${key}`;
+            const res = await fetch(url, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({contents: [{parts: [{text: prompt}]}]})
+            });
+            const data = await res.json();
+            document.getElementById('result').innerText = JSON.stringify(data);
         }
     </script>
 </body>
