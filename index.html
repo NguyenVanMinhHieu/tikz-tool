@@ -1,17 +1,58 @@
 <!DOCTYPE html>
-<html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>TikZ-Tool - Nguyễn Hiếu</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; max-width: 800px; margin: 20px auto; padding: 20px; line-height: 1.6; }
+        textarea { width: 100%; height: 150px; margin-bottom: 10px; padding: 10px; box-sizing: border-box; }
+        input { width: 100%; padding: 10px; margin-bottom: 10px; box-sizing: border-box; }
+        button { padding: 10px 20px; background: #007bff; color: white; border: none; cursor: pointer; border-radius: 4px; }
+        #result { background: #f4f4f4; padding: 15px; white-space: pre-wrap; border: 1px solid #ccc; margin-top: 20px; border-radius: 4px; font-family: monospace; }
+    </style>
+</head>
 <body>
-    <input type="password" id="key" placeholder="Nhập API Key">
-    <button onclick="check()">Liệt kê Model khả dụng</button>
-    <pre id="result"></pre>
+    <h1>TikZ-Tool - Nguyễn Hiếu</h1>
+    <input type="password" id="apiKey" placeholder="Nhập API Key">
+    <textarea id="prompt" placeholder="Mô tả hình vẽ..."></textarea>
+    <button onclick="generateTikz()">Tạo Code TiKz</button>
+    <button onclick="copyCode()" style="background: #28a745;">Copy Code</button>
+    <div id="result">Kết quả sẽ hiển thị ở đây...</div>
+
     <script>
-        async function check() {
-            const key = document.getElementById('key').value;
-            const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${key}`);
-            const data = await res.json();
-            // Chỉ lấy tên model để bạn dễ nhìn
-            const modelNames = data.models.map(m => m.name);
-            document.getElementById('result').innerText = modelNames.join('\n');
+        async function generateTikz() {
+            const apiKey = document.getElementById('apiKey').value;
+            const userPrompt = document.getElementById('prompt').value;
+            const resultDiv = document.getElementById('result');
+
+            if (!apiKey) { alert("Nhập API Key!"); return; }
+            resultDiv.innerText = "Đang tạo...";
+
+            try {
+                // Sử dụng model gemini-2.0-flash và đường dẫn v1beta
+                const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+                
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [{ parts: [{ text: "Bạn là chuyên gia TiKz. Hãy tạo code LaTeX sử dụng gói tkz-euclide cho yêu cầu: " + userPrompt }] }]
+                    })
+                });
+
+                const data = await response.json();
+                if (data.candidates) {
+                    resultDiv.innerText = data.candidates[0].content.parts[0].text;
+                } else {
+                    resultDiv.innerText = "Lỗi: " + JSON.stringify(data);
+                }
+            } catch (error) {
+                resultDiv.innerText = "Lỗi kết nối: " + error.message;
+            }
+        }
+
+        function copyCode() {
+            navigator.clipboard.writeText(document.getElementById('result').innerText).then(() => alert("Đã copy!"));
         }
     </script>
 </body>
