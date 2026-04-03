@@ -2,22 +2,14 @@
 <html>
 <body>
     <input type="password" id="key" placeholder="API Key">
-    <textarea id="prompt"></textarea>
-    <button onclick="run()">Tạo Code</button>
-    <div id="result"></div>
+    <button onclick="check()">Kiểm tra Model khả dụng</button>
+    <pre id="result"></pre>
     <script>
-        async function run() {
+        async function check() {
             const key = document.getElementById('key').value;
-            const prompt = document.getElementById('prompt').value;
-            // Dùng gemini-pro (model cơ bản nhất, luôn luôn tồn tại)
-            const url = `https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent?key=${key}`;
-            const res = await fetch(url, {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({contents: [{parts: [{text: prompt}]}]})
-            });
+            const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${key}`);
             const data = await res.json();
-            document.getElementById('result').innerText = JSON.stringify(data);
+            document.getElementById('result').innerText = JSON.stringify(data, null, 2);
         }
     </script>
 </body>
