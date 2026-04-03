@@ -1,49 +1,62 @@
-// To run this code you need to install the following dependencies:
-// dotnet add package Google.GenAI
+package com.example;
 
-using System;
-using System.Threading.Tasks;
-using System.Collections.Generic;
-using Google.GenAI;
-using Google.GenAI.Types;
-
-public class 
-{
-    public static async Task Main(string[] args)
-    {
-        var client = new Client(
-            apiKey: Environment.GetEnvironmentVariable("GEMINI_API_KEY")
-        );
-
-        var model = "gemini-pro-latest";
-        var contents = new List<Content>
-        {
-            new Content
-            {
-                Role = "user",
-                Parts = new List<Part>
-                {
-                    new Part { Text = "INSERT_INPUT_HERE" },
-                }
-            },
-        };
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+import com.google.genai.Client;
+import com.google.genai.ResponseStream;
+import com.google.genai.types.*;
+import com.google.gson.Gson;
+import com.google.genai.JsonSerializable;
 
 
+import java.util.ArrayList;
+import java.util.Base64;
+import java.util.List;
+import java.util.Map;
 
-        var config = new GenerateContentConfig
-        {
-            ThinkingConfig = new ThinkingConfig
-            {
-                ThinkingLevel = "HIGH"
-            },
-        };
 
-        await foreach (var chunk in client.Models.GenerateContentStreamAsync(model, contents, config))
-        {
-            Console.Write(chunk);
-        }
+public class  {
+  public static void main(String[] args) {
+    String apiKey = System.getenv("GEMINI_API_KEY");
+    Client client = Client.builder().apiKey(apiKey).build();
+    Gson gson = new Gson();
+
+
+    String model = "gemini-pro-latest";
+    List<Content> contents = ImmutableList.of(
+      Content.builder()
+        .role("user")
+        .parts(ImmutableList.of(
+          Part.fromText("INSERT_INPUT_HERE")
+        ))
+        .build()
+    );
+    GenerateContentConfig config =
+      GenerateContentConfig
+      .builder()
+      .thinkingConfig(
+        ThinkingConfig
+          .builder()
+          .thinkingLevel("HIGH")
+          .build()
+      )
+      .build();
+
+    ResponseStream<GenerateContentResponse> responseStream = client.models.generateContentStream(model, contents, config);
+
+    for (GenerateContentResponse res : responseStream) {
+      if (res.candidates().isEmpty() || res.candidates().get().get(0).content().isEmpty() || res.candidates().get().get(0).content().get().parts().isEmpty()) {
+        continue;
+      }
+
+      List<Part> parts = res.candidates().get().get(0).content().get().parts().get();
+      for (Part part : parts) {
+        System.out.println(part.text());
+      }
     }
 
+    responseStream.close();
+  }
 }
 
 
